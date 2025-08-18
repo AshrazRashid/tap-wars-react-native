@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
+  Easing,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -10,91 +11,76 @@ import {
 import ConfettiCannon from "react-native-confetti-cannon";
 
 const { height, width } = Dimensions.get("window");
-
-// Define your color palette
-const confettiColors = ["#FFD600", "#FF61A6", "#3DA9FC", "#00D084", "#FF9100"];
+const increment = 20;
 
 export default function TapWarsGame() {
-  const [playerOneHeight, setPlayerOneHeight] = useState(height / 2);
-  const [playerTwoHeight, setPlayerTwoHeight] = useState(height / 2);
   const [winner, setWinner] = useState<string | null>(null);
   const confettiRef = useRef<ConfettiCannon>(null);
 
-  // Animated values for smooth height transitions
-  const animatedPlayerOneHeight = useRef(
-    new Animated.Value(height / 2)
-  ).current;
-  const animatedPlayerTwoHeight = useRef(
-    new Animated.Value(height / 2)
-  ).current;
+  // Only use Animated.Value for heights
+  const playerOneHeight = useRef(new Animated.Value(height / 2)).current;
+  const playerTwoHeight = useRef(new Animated.Value(height / 2)).current;
 
-  const increment = 20; // pixels moved per tap
-  const animationDuration = 150; // milliseconds for smooth animation - reduced from 300ms
-
-  // Update animated values when state changes
-  useEffect(() => {
-    Animated.spring(animatedPlayerOneHeight, {
-      toValue: playerOneHeight,
-      useNativeDriver: false,
-      tension: 100,
-      friction: 8,
-    }).start();
-  }, [playerOneHeight, animatedPlayerOneHeight]);
-
-  useEffect(() => {
-    Animated.spring(animatedPlayerTwoHeight, {
-      toValue: playerTwoHeight,
-      useNativeDriver: false,
-      tension: 100,
-      friction: 8,
-    }).start();
-  }, [playerTwoHeight, animatedPlayerTwoHeight]);
+  const animateHeights = (newP1: number, newP2: number) => {
+    Animated.parallel([
+      Animated.timing(playerOneHeight, {
+        toValue: newP1,
+        duration: 120,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: false,
+      }),
+      Animated.timing(playerTwoHeight, {
+        toValue: newP2,
+        duration: 120,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: false,
+      }),
+    ]).start();
+  };
 
   const handleTap = (player: "one" | "two") => {
     if (winner) return;
 
-    if (player === "one") {
-      const newP1 = playerOneHeight + increment;
-      const newP2 = playerTwoHeight - increment;
-      if (newP1 >= height) {
-        setPlayerOneHeight(height);
-        setPlayerTwoHeight(0);
-        setWinner("PLAYER ONE");
-        confettiRef.current?.start();
-      } else {
-        setPlayerOneHeight(newP1);
-        setPlayerTwoHeight(newP2);
-      }
-    } else {
-      const newP2 = playerTwoHeight + increment;
-      const newP1 = playerOneHeight - increment;
-      if (newP2 >= height) {
-        setPlayerTwoHeight(height);
-        setPlayerOneHeight(0);
-        setWinner("PLAYER TWO");
-        confettiRef.current?.start();
-      } else {
-        setPlayerTwoHeight(newP2);
-        setPlayerOneHeight(newP1);
-      }
-    }
+    playerOneHeight.stopAnimation((p1) => {
+      playerTwoHeight.stopAnimation((p2) => {
+        if (player === "one") {
+          const newP1 = p1 + increment;
+          const newP2 = p2 - increment;
+          if (newP1 >= height) {
+            animateHeights(height, 0);
+            setWinner("PLAYER ONE");
+            confettiRef.current?.start();
+          } else {
+            animateHeights(newP1, newP2);
+          }
+        } else {
+          const newP2 = p2 + increment;
+          const newP1 = p1 - increment;
+          if (newP2 >= height) {
+            animateHeights(0, height);
+            setWinner("PLAYER TWO");
+            confettiRef.current?.start();
+          } else {
+            animateHeights(newP1, newP2);
+          }
+        }
+      });
+    });
   };
 
   const resetGame = () => {
-    setPlayerOneHeight(height / 2);
-    setPlayerTwoHeight(height / 2);
+    animateHeights(height / 2, height / 2);
     setWinner(null);
   };
 
   return (
     <View style={styles.container}>
-      {/* Player One Area */}
       <Animated.View
         style={[
           styles.playerOne,
           {
-            height: animatedPlayerOneHeight,
-            backgroundColor: "#FF6B6B",
+            height: playerOneHeight,
+            backgroundColor: "rgba(25, 118, 210, 0.8)",
           },
         ]}
       >
@@ -102,20 +88,20 @@ export default function TapWarsGame() {
           style={styles.playerTouchable}
           onPress={() => handleTap("one")}
           activeOpacity={0.8}
+          disabled={!!winner}
         >
           <Text style={[styles.text, { transform: [{ rotate: "180deg" }] }]}>
             PLAYER ONE
           </Text>
         </TouchableOpacity>
       </Animated.View>
-
-      {/* Player Two Area */}
+      <View style={styles.divider} />
       <Animated.View
         style={[
           styles.playerTwo,
           {
-            height: animatedPlayerTwoHeight,
-            backgroundColor: "#4ECDC4",
+            height: playerTwoHeight,
+            backgroundColor: "rgba(255, 97, 166, 0.8)",
           },
         ]}
       >
@@ -123,12 +109,11 @@ export default function TapWarsGame() {
           style={styles.playerTouchable}
           onPress={() => handleTap("two")}
           activeOpacity={0.8}
+          disabled={!!winner}
         >
           <Text style={styles.text}>PLAYER TWO</Text>
         </TouchableOpacity>
       </Animated.View>
-
-      {/* Winner Banner */}
       {winner && (
         <View style={styles.winnerBanner}>
           <Text style={styles.winnerText}>{winner} WINS 🎉</Text>
@@ -137,8 +122,6 @@ export default function TapWarsGame() {
           </TouchableOpacity>
         </View>
       )}
-
-      {/* Confetti */}
       <ConfettiCannon
         ref={confettiRef}
         count={150}
@@ -146,7 +129,7 @@ export default function TapWarsGame() {
         autoStart={false}
         fadeOut
         fallSpeed={2000}
-        colors={confettiColors}
+        colors={["#FFD600", "#FF61A6", "#3DA9FC", "#00D084", "#FF9100"]}
       />
     </View>
   );
@@ -173,6 +156,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
+  },
+  divider: {
+    height: 2,
+    backgroundColor: "#222",
+    width: "100%",
+    zIndex: 2,
   },
   text: {
     color: "#fff",

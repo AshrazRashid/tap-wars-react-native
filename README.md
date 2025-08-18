@@ -1,50 +1,69 @@
-# Welcome to your Expo app 👋
+# Tap Wars: Tug-of-War Game 🚀
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A fast-paced, two-player tap battle built with React Native (Expo). Challenge a friend in real time—each tap moves the dividing line toward your opponent. The first to fully cover the screen with their color wins, complete with a confetti celebration!
 
-## Get started
+---
 
-1. Install dependencies
+## 🎮 Gameplay
 
+- **Two players** compete on the same device.
+- **Each tap** moves the border toward your opponent.
+- **Player areas** fill with vibrant, modern colors.
+- **First to cover the screen** wins instantly—no timer!
+- **Confetti blast** celebrates the winner.
+- **Restart** button for rematches.
+
+---
+
+## 🖌️ Visuals
+
+- Player One: semi-transparent vivid blue (`rgba(25, 118, 210, 0.8)`)
+- Player Two: semi-transparent hot pink (`rgba(255, 97, 166, 0.8)`)
+- Clean, modern UI—perfect for sharing on LinkedIn!
+
+---
+
+## 🚀 Getting Started
+
+1. **Install dependencies**
    ```bash
    npm install
    ```
-
-2. Start the app
-
+2. **Start the app**
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+Open in Expo Go, iOS Simulator, or Android Emulator.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 📸 Share Your Win!
 
-## Get a fresh project
+- Take a screenshot of your victory and share it on LinkedIn with #TapWars and tag your opponent!
+- Show off your fastest win or most epic comeback.
 
-When you're ready, run:
+---
 
-```bash
-npm run reset-project
-```
+## 🛠️ Tech Stack
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+- React Native (Expo)
+- Animated API for smooth transitions
+- `react-native-confetti-cannon` for celebration
 
-## Learn more
+---
 
-To learn more about developing your project with Expo, look at the following resources:
+## 🤝 Contributing
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Pull requests and suggestions welcome!
 
-## Join the community
+---
 
-Join our community of developers creating universal apps.
+## 📚 Learn More
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- [Expo documentation](https://docs.expo.dev/)
+- [React Native docs](https://reactnative.dev/)
+
+---
+
+Enjoy the game and happy tapping! 🏆
