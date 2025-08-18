@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   Dimensions,
   StyleSheet,
@@ -14,26 +14,16 @@ const { height, width } = Dimensions.get("window");
 const confettiColors = ["#FFD600", "#FF61A6", "#3DA9FC", "#00D084", "#FF9100"];
 
 // Custom square component for confetti
-const SquareConfetti = ({ color }) => (
-  <View
-    style={{
-      width: 16,
-      height: 16,
-      backgroundColor: color,
-      borderRadius: 2, // slight rounding, or set to 0 for sharp squares
-    }}
-  />
-);
 
 export default function TapWarsGame() {
   const [playerOneHeight, setPlayerOneHeight] = useState(height / 2);
   const [playerTwoHeight, setPlayerTwoHeight] = useState(height / 2);
-  const [winner, setWinner] = useState(null);
-  const confettiRef = useRef(null);
+  const [winner, setWinner] = useState<string | null>(null);
+  const confettiRef = useRef<ConfettiCannon>(null);
 
   const increment = 20; // pixels moved per tap
 
-  const handleTap = (player) => {
+  const handleTap = (player: "one" | "two") => {
     if (winner) return;
 
     if (player === "one") {
@@ -43,7 +33,7 @@ export default function TapWarsGame() {
         setPlayerOneHeight(height);
         setPlayerTwoHeight(0);
         setWinner("PLAYER ONE");
-        confettiRef.current.start();
+        confettiRef.current?.start();
       } else {
         setPlayerOneHeight(newP1);
         setPlayerTwoHeight(newP2);
@@ -55,7 +45,7 @@ export default function TapWarsGame() {
         setPlayerTwoHeight(height);
         setPlayerOneHeight(0);
         setWinner("PLAYER TWO");
-        confettiRef.current.start();
+        confettiRef.current?.start();
       } else {
         setPlayerTwoHeight(newP2);
         setPlayerOneHeight(newP1);
@@ -110,7 +100,6 @@ export default function TapWarsGame() {
         fadeOut
         fallSpeed={2000}
         colors={confettiColors}
-        fallingComponent={({ color }) => <SquareConfetti color={color} />}
       />
     </View>
   );
@@ -120,15 +109,15 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "column",
     height: "100%",
-    backgroundColor: "#111",
+    backgroundColor: "#1a1a1a",
   },
   playerOne: {
-    backgroundColor: "#0B3D91",
+    backgroundColor: "#FF6B6B",
     justifyContent: "center",
     alignItems: "center",
   },
   playerTwo: {
-    backgroundColor: "#3DA9FC",
+    backgroundColor: "#4ECDC4",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -144,7 +133,7 @@ const styles = StyleSheet.create({
     top: "45%",
     left: "20%",
     right: "20%",
-    backgroundColor: "rgba(0,0,0,0.6)",
+    backgroundColor: "rgba(0,0,0,0.8)",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
@@ -156,7 +145,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   resetButton: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFD93D",
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 8,
@@ -164,5 +153,6 @@ const styles = StyleSheet.create({
   resetText: {
     fontSize: 16,
     fontWeight: "bold",
+    color: "#333",
   },
 });
