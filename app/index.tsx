@@ -1,5 +1,6 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  Animated,
   Dimensions,
   StyleSheet,
   Text,
@@ -13,15 +14,41 @@ const { height, width } = Dimensions.get("window");
 // Define your color palette
 const confettiColors = ["#FFD600", "#FF61A6", "#3DA9FC", "#00D084", "#FF9100"];
 
-// Custom square component for confetti
-
 export default function TapWarsGame() {
   const [playerOneHeight, setPlayerOneHeight] = useState(height / 2);
   const [playerTwoHeight, setPlayerTwoHeight] = useState(height / 2);
   const [winner, setWinner] = useState<string | null>(null);
   const confettiRef = useRef<ConfettiCannon>(null);
 
+  // Animated values for smooth height transitions
+  const animatedPlayerOneHeight = useRef(
+    new Animated.Value(height / 2)
+  ).current;
+  const animatedPlayerTwoHeight = useRef(
+    new Animated.Value(height / 2)
+  ).current;
+
   const increment = 20; // pixels moved per tap
+  const animationDuration = 150; // milliseconds for smooth animation - reduced from 300ms
+
+  // Update animated values when state changes
+  useEffect(() => {
+    Animated.spring(animatedPlayerOneHeight, {
+      toValue: playerOneHeight,
+      useNativeDriver: false,
+      tension: 100,
+      friction: 8,
+    }).start();
+  }, [playerOneHeight, animatedPlayerOneHeight]);
+
+  useEffect(() => {
+    Animated.spring(animatedPlayerTwoHeight, {
+      toValue: playerTwoHeight,
+      useNativeDriver: false,
+      tension: 100,
+      friction: 8,
+    }).start();
+  }, [playerTwoHeight, animatedPlayerTwoHeight]);
 
   const handleTap = (player: "one" | "two") => {
     if (winner) return;
@@ -62,24 +89,44 @@ export default function TapWarsGame() {
   return (
     <View style={styles.container}>
       {/* Player One Area */}
-      <TouchableOpacity
-        style={[styles.playerOne, { height: playerOneHeight }]}
-        onPress={() => handleTap("one")}
-        activeOpacity={0.8}
+      <Animated.View
+        style={[
+          styles.playerOne,
+          {
+            height: animatedPlayerOneHeight,
+            backgroundColor: "#FF6B6B",
+          },
+        ]}
       >
-        <Text style={[styles.text, { transform: [{ rotate: "180deg" }] }]}>
-          PLAYER ONE
-        </Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.playerTouchable}
+          onPress={() => handleTap("one")}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.text, { transform: [{ rotate: "180deg" }] }]}>
+            PLAYER ONE
+          </Text>
+        </TouchableOpacity>
+      </Animated.View>
 
       {/* Player Two Area */}
-      <TouchableOpacity
-        style={[styles.playerTwo, { height: playerTwoHeight }]}
-        onPress={() => handleTap("two")}
-        activeOpacity={0.8}
+      <Animated.View
+        style={[
+          styles.playerTwo,
+          {
+            height: animatedPlayerTwoHeight,
+            backgroundColor: "#4ECDC4",
+          },
+        ]}
       >
-        <Text style={styles.text}>PLAYER TWO</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.playerTouchable}
+          onPress={() => handleTap("two")}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.text}>PLAYER TWO</Text>
+        </TouchableOpacity>
+      </Animated.View>
 
       {/* Winner Banner */}
       {winner && (
@@ -112,14 +159,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#1a1a1a",
   },
   playerOne: {
-    backgroundColor: "#FF6B6B",
     justifyContent: "center",
     alignItems: "center",
+    overflow: "hidden",
   },
   playerTwo: {
-    backgroundColor: "#4ECDC4",
     justifyContent: "center",
     alignItems: "center",
+    overflow: "hidden",
+  },
+  playerTouchable: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
   },
   text: {
     color: "#fff",
